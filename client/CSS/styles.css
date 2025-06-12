@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,5 +27,9 @@
 }
 .calculator-modal {
     max-height: 80vh;
+    overflow-y: auto;
+}
+.wiki-extract {
+    max-height: 300px;
     overflow-y: auto;
 }
