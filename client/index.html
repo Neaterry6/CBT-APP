@@ -9,9 +9,9 @@
 <body class="bg-gray-900 text-white min-h-screen flex flex-col font-sans">
     <!-- Loading Page -->
     <div id="loadingPage" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50">
-        <img src="/assets/logo.png" alt="App Logo" class="w-32 h-32 mb-4 glitch">
-        <h1 class="text-4xl font-bold glitch">🎓 POST UTME CBT - University of Ibadan</h1>
-        <p class="text-lg mt-2">Loading Practice Platform...</p>
+        <img src="/assets/logo.png" alt="App Logo" class="w-24 h-24 md:w-32 md:h-32 mb-4 glitch">
+        <h1 class="text-2xl md:text-4xl font-bold glitch">🎓 POST UTME CBT - University of Ibadan</h1>
+        <p class="text-base md:text-lg mt-2">Loading Practice Platform...</p>
     </div>
 
     <!-- Main App Container -->
@@ -19,12 +19,12 @@
         <!-- Header -->
         <header class="bg-gray-800 p-4 flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <h1 class="text-xl md:text-2xl font-bold">🎓 POST UTME CBT - UI</h1>
+                <h1 class="text-lg md:text-2xl font-bold">🎓 POST UTME CBT - UI</h1>
             </div>
-            <div id="profileSection" class="flex items-center space-x-4">
+            <div id="profileSection" class="flex items-center space-x-2 md:space-x-4">
                 <img id="profileAvatar" class="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover" src="/assets/placeholder.jpg" alt="Profile Avatar">
                 <span id="profileName" class="font-semibold text-sm md:text-base"></span>
-                <button id="logoutBtn" class="bg-red-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-red-700 text-sm md:text-base">Logout</button>
+                <button id="logoutBtn" class="bg-red-600 px-2 py-1 md:px-4 md:py-2 rounded hover:bg-red-700 text-sm md:text-base">Logout</button>
             </div>
         </header>
 
@@ -66,14 +66,26 @@
             <div id="dashboard" class="hidden">
                 <h2 class="text-2xl md:text-3xl font-bold mb-6">Welcome, <span id="welcomeName"></span>!</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Subject buttons (unchanged for brevity) -->
                     <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="English"><span>📚</span><span>English</span></button>
-                    <!-- Add other subjects similarly -->
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Mathematics"><span>🧮</span><span>Mathematics</span></button>
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Biology"><span>🧬</span><span>Biology</span></button>
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Physics"><span>⚛️</span><span>Physics</span></button>
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Chemistry"><span>🧪</span><span>Chemistry</span></button>
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Economics"><span>💰</span><span>Economics</span></button>
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Government"><span>🏛️</span><span>Government</span></button>
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Literature"><span>📖</span><span>Literature</span></button>
                 </div>
                 <div class="mt-8">
                     <h3 class="text-xl md:text-2xl font-bold mb-4">📚 Study Plans</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        <!-- Study plan buttons (unchanged for brevity) -->
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="English"><span>📖</span><span>English Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Mathematics"><span>📐</span><span>Mathematics Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Biology"><span>🔬</span><span>Biology Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Physics"><span>⚛️</span><span>Physics Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Chemistry"><span>⚗️</span><span>Chemistry Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Economics"><span>📊</span><span>Economics Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Government"><span>🏛️</span><span>Government Study Plan</span></button>
+                        <button class="study-plan-btn bg-purple-600 p-4 rounded hover:bg-purple-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="Literature"><span>📚</span><span>Literature Study Plan</span></button>
                     </div>
                 </div>
                 <button id="showLeaderboard" class="mt-6 bg-green-600 px-4 py-2 rounded hover:bg-green-700 text-sm md:text-base">View Leaderboard</button>
@@ -105,6 +117,25 @@
                 </div>
             </div>
 
+            <!-- Calculator Modal -->
+            <div id="calculatorModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-40 hidden">
+                <div class="bg-gray-800 p-6 rounded-lg w-full max-w-sm md:max-w-lg calculator-modal">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="calculatorTitle" class="text-xl md:text-2xl font-bold"></h2>
+                        <button id="closeCalculator" class="bg-red-600 px-3 py-1 rounded hover:bg-red-700 text-sm md:text-base">Close</button>
+                    </div>
+                    <div id="calculatorContent"></div>
+                </div>
+            </div>
+
+            <!-- Review Section -->
+            <div id="reviewSection" class="hidden">
+                <h2 class="text-xl md:text-2xl font-bold mb-4">Review Your Answers</h2>
+                <div id="reviewContent"></div>
+                <button id="backToDashboard" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 mt-4 text-sm md:text-base">Back to Dashboard</button>
+                <button id="retryQuiz" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 mt-4 ml-4 text-sm md:text-base">Retry Quiz</button>
+            </div>
+
             <!-- Study Plan Section -->
             <div id="studyPlanSection" class="hidden">
                 <div class="flex justify-between items-center mb-6 flex-col sm:flex-row">
@@ -123,6 +154,11 @@
                         <div id="wikiContent" class="prose prose-invert max-w-none text-sm md:text-base"></div>
                     </div>
                 </div>
+                <!-- Topic Selection -->
+                <div id="topicSelection" class="mb-6">
+                    <h3 class="text-lg md:text-xl font-bold mb-4">Select a Topic to Study:</h3>
+                    <div id="topicsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+                </div>
                 <!-- Study Content -->
                 <div id="studyContent" class="hidden">
                     <div class="bg-gray-800 rounded-lg p-4 md:p-6 mb-6">
@@ -134,8 +170,30 @@
                             </div>
                         </div>
                         <div id="studyPlanContent" class="prose prose-invert max-w-none text-sm md:text-base"></div>
+                        <div class="mt-6 p-4 bg-gray-700 rounded">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold">Study Progress</span>
+                                <span id="studyProgress">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-600 rounded-full h-2">
+                                <div id="studyProgressBar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <button id="markAsStudied" class="mt-4 bg-green-600 px-4 py-2 rounded hover:bg-green-700 w-full text-sm md:text-base">✓ Mark Topic as Studied</button>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="backToTopics" class="bg-gray-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-gray-700 text-sm md:text-base">← Back to Topics</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div id="leaderboardSection" class="hidden">
+                <h2 class="text-xl md:text-2xl font-bold mb-4">Leaderboard</h2>
+                <div class="bg-gray-800 p-4 rounded">
+                    <div id="leaderboardContent"></div>
+                </div>
+                <button id="backToDashboardLeaderboard" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 mt-4 text-sm md:text-base">Back to Dashboard</button>
             </div>
         </main>
 
@@ -143,6 +201,6 @@
         <div id="confettiContainer" class="fixed inset-0 pointer-events-none"></div>
     </div>
 
-    <script src="/js/app.js"></script>
+    <script type="module" src="/js/app.js"></script>
 </body>
 </html>
