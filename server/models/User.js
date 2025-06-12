@@ -5,4 +5,4 @@ const userSchema = new mongoose.Schema({
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema); 
