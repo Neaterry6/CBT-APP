@@ -25,7 +25,7 @@ router.post('/quiz', async (req, res) => {
     }
 });
 
-router.post('/studied', async (req, res) => {
+router.post('/topic', async (req, res) => {
     try {
         const studiedTopic = new StudiedTopic(req.body);
         await studiedTopic.save();
