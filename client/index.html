@@ -1,1 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 POST UTME CBT - University of Ibadan</title>
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col font-sans">
+    <!-- Loading Page -->
+    <div id="loadingPage" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50">
+        <img src="/assets/logo.png" alt="App Logo" class="w-32 h-32 mb-4 glitch">
+        <h1 class="text-4xl font-bold glitch">🎓 POST UTME CBT - University of Ibadan</h1>
+        <p class="text-lg mt-2">Loading Practice Platform...</p>
+    </div>
 
+    <!-- Main App Container -->
+    <div id="appContainer" class="hidden flex flex-col min-h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 p-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl md:text-2xl font-bold">🎓 POST UTME CBT - UI</h1>
+            </div>
+            <div id="profileSection" class="flex items-center space-x-4">
+                <img id="profileAvatar" class="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover" src="/assets/placeholder.jpg" alt="Profile Avatar">
+                <span id="profileName" class="font-semibold text-sm md:text-base"></span>
+                <button id="logoutBtn" class="bg-red-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-red-700 text-sm md:text-base">Logout</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="flex-1 p-4 md:p-6">
+            <!-- Login/Signup Modal -->
+            <div id="authModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-40 hidden">
+                <div class="bg-gray-800 p-6 rounded-lg w-full max-w-sm md:max-w-md">
+                    <h2 class="text-xl md:text-2xl font-bold mb-4">Login / Signup</h2>
+                    <input id="nicknameInput" type="text" placeholder="Enter your nickname" class="w-full p-2 mb-4 bg-gray-700 rounded text-white text-sm md:text-base">
+                    <input id="avatarInput" type="file" accept="image/*" class="w-full p-2 mb-4 bg-gray-700 rounded text-white text-sm md:text-base">
+                    <img id="avatarPreview" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover mb-4 mx-auto" src="/assets/placeholder.jpg" alt="Avatar Preview">
+                    <button id="authBtn" class="w-full bg-blue-600 p-2 rounded hover:bg-blue-700 text-sm md:text-base">Continue</button>
+                </div>
+            </div>
+
+            <!-- Quiz Settings Modal -->
+            <div id="quizSettingsModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-40 hidden">
+                <div class="bg-gray-800 p-6 rounded-lg w-full max-w-sm md:max-w-md">
+                    <h2 class="text-xl md:text-2xl font-bold mb-4">Quiz Settings</h2>
+                    <label class="block mb-2 text-sm md:text-base">Number of Questions:</label>
+                    <select id="questionCount" class="w-full p-2 mb-4 bg-gray-700 rounded text-white text-sm md:text-base">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                    </select>
+                    <label class="block mb-2 text-sm md:text-base">Time per Question (seconds):</label>
+                    <select id="timePerQuestion" class="w-full p-2 mb-4 bg-gray-700 rounded text-white text-sm md:text-base">
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                        <option value="60">60</option>
+                    </select>
+                    <button id="startQuizBtn" class="w-full bg-blue-600 p-2 rounded hover:bg-blue-700 text-sm md:text-base">Start Quiz</button>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="hidden">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6">Welcome, <span id="welcomeName"></span>!</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Subject buttons (unchanged for brevity) -->
+                    <button class="subject-btn bg-blue-600 p-4 rounded hover:bg-blue-700 transition transform hover:scale-105 flex items-center space-x-2 text-sm md:text-base" data-subject="English"><span>📚</span><span>English</span></button>
+                    <!-- Add other subjects similarly -->
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-xl md:text-2xl font-bold mb-4">📚 Study Plans</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Study plan buttons (unchanged for brevity) -->
+                    </div>
+                </div>
+                <button id="showLeaderboard" class="mt-6 bg-green-600 px-4 py-2 rounded hover:bg-green-700 text-sm md:text-base">View Leaderboard</button>
+            </div>
+
+            <!-- Quiz Section -->
+            <div id="quizSection" class="hidden">
+                <div class="flex justify-between mb-4 flex-col sm:flex-row">
+                    <span id="questionCounter" class="text-base md:text-lg font-semibold"></span>
+                    <div class="flex items-center space-x-4 mt-2 sm:mt-0">
+                        <button id="calculatorBtn" class="bg-yellow-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-yellow-700 hidden text-sm md:text-base">Calculator</button>
+                        <span id="timerDisplay" class="text-base md:text-lg font-semibold bg-red-600 px-3 py-1 md:px-4 md:py-2 rounded"></span>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-800 rounded h-2 mb-4">
+                    <div id="progressFill" class="bg-blue-600 h-full rounded"></div>
+                </div>
+                <img id="questionImage" class="max-w-full h-auto mb-4 hidden" alt="Question Image">
+                <p id="questionText" class="text-lg md:text-xl mb-4"></p>
+                <div id="optionsContainer" class="grid grid-cols-1 gap-4"></div>
+                <div class="flex justify-between mt-6 flex-col sm:flex-row gap-2">
+                    <button id="prevBtn" class="bg-gray-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-gray-700 text-sm md:text-base">Previous</button>
+                    <button id="submitBtn" class="bg-blue-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-700 text-sm md:text-base" disabled>Submit</button>
+                    <button id="nextBtn" class="bg-blue-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-700 hidden text-sm md:text-base">Next</button>
+                </div>
+                <div id="explanationContainer" class="mt-6 bg-gray-800 p-4 rounded hidden">
+                    <p id="explanationText" class="text-sm md:text-base whitespace-pre-wrap"></p>
+                    <button id="toggleAI" class="mt-4 bg-green-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-green-700 text-sm md:text-base">Switch to GPT</button>
+                </div>
+            </div>
+
+            <!-- Study Plan Section -->
+            <div id="studyPlanSection" class="hidden">
+                <div class="flex justify-between items-center mb-6 flex-col sm:flex-row">
+                    <h2 class="text-2xl md:text-3xl font-bold">📚 Study Plan - <span id="studySubjectTitle"></span></h2>
+                    <button id="backToDashboardStudy" class="bg-gray-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-gray-700 mt-2 sm:mt-0 text-sm md:text-base">← Back to Dashboard</button>
+                </div>
+                <!-- Wikipedia Search -->
+                <div id="wikipediaSearch" class="mb-6">
+                    <h3 class="text-lg md:text-xl font-bold mb-4">🔍 Wikipedia Topic Search</h3>
+                    <div class="flex gap-2 mb-4 flex-col sm:flex-row">
+                        <input id="wikiSearchInput" type="text" placeholder="Search for a topic..." class="w-full p-2 bg-gray-700 rounded text-white text-sm md:text-base">
+                        <button id="wikiSearchBtn" class="bg-blue-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-700 text-sm md:text-base">Search</button>
+                    </div>
+                    <div id="wikiResults" class="bg-gray-800 p-4 rounded hidden">
+                        <h4 class="text-base md:text-lg font-semibold mb-2">Search Results</h4>
+                        <div id="wikiContent" class="prose prose-invert max-w-none text-sm md:text-base"></div>
+                    </div>
+                </div>
+                <!-- Study Content -->
+                <div id="studyContent" class="hidden">
+                    <div class="bg-gray-800 rounded-lg p-4 md:p-6 mb-6">
+                        <div class="flex justify-between items-center mb-4 flex-col sm:flex-row">
+                            <h3 class="text-xl md:text-2xl font-bold" id="currentTopicTitle"></h3>
+                            <div class="flex space-x-2 mt-2 sm:mt-0">
+                                <button id="regenerateStudyPlan" class="bg-blue-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-700 text-sm md:text-base">🔄 Regenerate</button>
+                                <button id="startTopicQuiz" class="bg-green-600 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-green-700 text-sm md:text-base">📝 Take Quiz</button>
+                            </div>
+                        </div>
+                        <div id="studyPlanContent" class="prose prose-invert max-w-none text-sm md:text-base"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Confetti Container -->
+        <div id="confettiContainer" class="fixed inset-0 pointer-events-none"></div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
