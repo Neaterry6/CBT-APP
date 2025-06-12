@@ -1,1 +1,64 @@
+---
 
+### Setup Instructions
+
+1. **Create the Repository**:
+   - Create a directory named `utme-cbt-app`.
+   - Replicate the structure above, placing each file in its respective path.
+   - Use placeholder images for `client/assets/` (e.g., from `https://via.placeholder.com/150`) or add your own.
+
+2. **Install Dependencies**:
+   - In `client/`:
+     ```bash
+     cd client
+     npm install
+     ```
+   - In `server/`:
+     ```bash
+     cd server
+     npm install
+     ```
+
+3. **Configure MongoDB**:
+   - Update `server/.env` with your MongoDB URI (provided: `MONGO_URI=mongodb+srv://Utmecbt:isaiahilom@1@utme.7jkkmin.mongodb.net/?retryWrites=true&w=majority&appName=APP`).
+   - Ensure MongoDB Atlas is accessible and create collections (`users`, `quizresults`, `studiedtopics`).
+
+4. **Run the Application**:
+   - Start the server:
+     ```bash
+     cd server
+     npm run dev
+     ```
+   - Start the client:
+     ```bash
+     cd client
+     npm start
+     ```
+   - Access the app at `http://localhost:5173`.
+
+5. **Test Features**:
+   - **Wikipedia Search**: In the study section, enter a topic (e.g., "Photosynthesis") and check for title, image, and content.
+   - **AI Explanation**: Take a quiz, submit an answer, and verify detailed explanations appear.
+   - **Green Highlight & Confetti**: Ensure correct answers show green and trigger confetti.
+   - **Quiz Settings**: Select question count (10-25) and time (30-60s) in the settings modal.
+   - **Study Plan Table**: Verify study plans are tabular in the study section.
+   - **MongoDB**: Check MongoDB Atlas for saved user profiles, quiz results, and studied topics.
+   - **Responsive Design**: Test on mobile and desktop browsers for webview compatibility.
+   - **Calculator**: Use the calculator in Mathematics, Physics, or Chemistry quizzes.
+
+---
+
+### Notes
+
+- **Wikipedia API**: The `searchWikipedia` method in `quiz.js` uses the MediaWiki Action API for reliable search and image retrieval.
+- **AI Explanation**: The `showExplanation` method in `quiz.js` includes a detailed prompt and fallback for API issues.
+- **Green Highlight & Confetti**: Implemented in `showCorrectAnswer` and `showConfetti` in `quiz.js`.
+- **Responsive Design**: Tailwind CSS ensures mobile compatibility with classes like `sm:`, `md:`.
+- **Quiz Settings**: The `quizSettingsModal` and `showQuizSettings` in `quiz.js` handle custom question counts and timers.
+- **MongoDB**: Backend routes in `server/routes/api.js` save user profiles, quiz results, and studied topics.
+- **Study Plan Table**: The `generateStudyPlan` method in `quiz.js` creates tabular study plans.
+- **Calculator**: The `getCalculatorContent` method in `quiz.js` provides a basic calculator and quadratic solver for relevant subjects.
+- **Assets**: Replace `/assets/logo.png` and `/assets/placeholder.jpg` with actual images.
+- **APIs**: Ensure the question API (`questions.aloc.com.ng`), AI API (`kaiz-apis.gleeze.com`), and Wikipedia API are accessible. Replace with your own if needed.
+
+If you encounter issues or need further assistance (e.g., debugging, additional features, or deployment), please let me know, and I’ll provide targeted support!
