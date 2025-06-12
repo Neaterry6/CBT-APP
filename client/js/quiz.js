@@ -1,6 +1,6 @@
 // client/js/quiz.js
 import { showElement, hideElement } from './ui.js';
-import { saveUserProfile, saveQuizResult, fetchLeaderboard } from './api.js';
+import { saveUserProfile, saveQuizResult, saveStudiedTopic, fetchLeaderboard } from './api.js';
 
 export default class QuizApp {
     constructor() {
@@ -14,13 +14,14 @@ export default class QuizApp {
         this.avatarInput = document.getElementById('avatarInput');
         this.avatarPreview = document.getElementById('avatarPreview');
         this.authBtn = document.getElementById('authBtn');
+        this.logoutBtn = document.getElementById('logoutBtn');
         this.dashboard = document.getElementById('dashboard');
         this.welcomeName = document.getElementById('welcomeName');
-        this.quizSection = document.getElementById('quizSection');
         this.quizSettingsModal = document.getElementById('quizSettingsModal');
         this.questionCount = document.getElementById('questionCount');
         this.timePerQuestion = document.getElementById('timePerQuestion');
         this.startQuizBtn = document.getElementById('startQuizBtn');
+        this.quizSection = document.getElementById('quizSection');
         this.questionCounter = document.getElementById('questionCounter');
         this.timerDisplay = document.getElementById('timerDisplay');
         this.progressFill = document.getElementById('progressFill');
@@ -37,11 +38,6 @@ export default class QuizApp {
         this.reviewContent = document.getElementById('reviewContent');
         this.backToDashboard = document.getElementById('backToDashboard');
         this.retryQuiz = document.getElementById('retryQuiz');
-        this.leaderboardSection = document.getElementById('leaderboardSection');
-        this.leaderboardContent = document.getElementById('leaderboardContent');
-        this.backToDashboardLeaderboard = document.getElementById('backToDashboardLeaderboard');
-        this.showLeaderboard = document.getElementById('showLeaderboard');
-        this.logoutBtn = document.getElementById('logoutBtn');
         this.studyPlanSection = document.getElementById('studyPlanSection');
         this.studySubjectTitle = document.getElementById('studySubjectTitle');
         this.topicSelection = document.getElementById('topicSelection');
@@ -60,6 +56,10 @@ export default class QuizApp {
         this.wikiSearchBtn = document.getElementById('wikiSearchBtn');
         this.wikiResults = document.getElementById('wikiResults');
         this.wikiContent = document.getElementById('wikiContent');
+        this.leaderboardSection = document.getElementById('leaderboardSection');
+        this.leaderboardContent = document.getElementById('leaderboardContent');
+        this.backToDashboardLeaderboard = document.getElementById('backToDashboardLeaderboard');
+        this.showLeaderboard = document.getElementById('showLeaderboard');
         this.calculatorBtn = document.getElementById('calculatorBtn');
         this.calculatorModal = document.getElementById('calculatorModal');
         this.calculatorTitle = document.getElementById('calculatorTitle');
@@ -72,17 +72,17 @@ export default class QuizApp {
         this.currentQuestionIndex = 0;
         this.totalQuestions = 10;
         this.timePerQuestion = 30;
-        this.score = 0;
         this.timeRemaining = 30;
         this.selectedAnswer = null;
         this.sessionData = [];
+        this.score = 0;
         this.timer = null;
-        this.useGemini = false;
-        this.currentTopic = null;
         this.currentStudySubject = null;
-        this.studiedTopics = {};
+        this.currentTopic = null;
+        this.studiedTopics = JSON.parse(localStorage.getItem('studiedTopics')) || {};
         this.isTopicBasedQuiz = false;
         this.currentTopicContext = null;
+        this.useGemini = false;
 
         this.bindEventListeners();
         this.init();
@@ -91,15 +91,15 @@ export default class QuizApp {
     bindEventListeners() {
         this.authBtn.addEventListener('click', () => this.handleAuth());
         this.avatarInput.addEventListener('change', () => this.previewAvatar());
+        this.logoutBtn.addEventListener('click', () => this.logout());
         this.prevBtn.addEventListener('click', () => this.prevQuestion());
         this.submitBtn.addEventListener('click', () => this.submitAnswer());
         this.nextBtn.addEventListener('click', () => this.nextQuestion());
         this.toggleAI.addEventListener('click', () => this.toggleAIExplanation());
         this.backToDashboard.addEventListener('click', () => this.showDashboard());
         this.retryQuiz.addEventListener('click', () => this.startQuiz(this.currentSubject));
-        this.backToDashboardLeaderboard.addEventListener('click', () => this.showDashboard());
         this.showLeaderboard.addEventListener('click', () => this.showLeaderboardSection());
-        this.logoutBtn.addEventListener('click', () => this.logout());
+        this.backToDashboardLeaderboard.addEventListener('click', () => this.showDashboard());
         this.backToDashboardStudy.addEventListener('click', () => this.showDashboard());
         this.backToTopics.addEventListener('click', () => this.showTopicSelection());
         this.regenerateStudyPlan.addEventListener('click', () => this.generateStudyPlan(this.currentTopic));
@@ -114,15 +114,13 @@ export default class QuizApp {
         });
         document.querySelectorAll('.study-plan-btn').forEach(btn => {
             btn.addEventListener('click', () => this.showStudyPlan(btn.dataset.subject));
-        });
-    }
-
+        }
     async init() {
         console.log('Initializing QuizApp...');
         try {
             hideElement('loadingPage');
-            showElement('appContainer');
-            let profile = JSON.parse(localStorage.getItem('profile') || '{}');
+            showElementById('appContainer'));
+            let profile = JSON.parse(localStorage.getItem('profile') || {};
             if (profile.nickname) {
                 this.profileName.textContent = profile.nickname;
                 this.welcomeName.textContent = profile.nickname;
@@ -133,8 +131,8 @@ export default class QuizApp {
             }
         } catch (error) {
             console.error('Initialization failed:', error);
-            showElement('authModal');
-            alert('App failed to load. Please refresh.');
+            showElementById('authModal');
+            alert('Failed to initialize app. Please refresh.');
         }
     }
 
@@ -177,8 +175,8 @@ export default class QuizApp {
         showElement('authModal');
         hideElement('dashboard');
         hideElement('quizSection');
-        hideElement('leaderboardSection');
         hideElement('studyPlanSection');
+        hideElement('leaderboardSection');
         this.nicknameInput.value = '';
         this.avatarPreview.src = '/assets/placeholder.jpg';
     }
@@ -187,25 +185,9 @@ export default class QuizApp {
         showElement('dashboard');
         hideElement('quizSection');
         hideElement('reviewSection');
-        hideElement('leaderboardSection');
         hideElement('studyPlanSection');
+        hideElement('leaderboardSection');
         hideElement('calculatorModal');
-    }
-
-    async showLeaderboardSection() {
-        hideElement('dashboard');
-        showElement('leaderboardSection');
-        try {
-            const leaderboard = await fetchLeaderboard();
-            this.leaderboardContent.innerHTML = leaderboard.map((entry, i) => `
-                <div class="flex justify-between py-2 ${i < leaderboard.length - 1 ? 'border-b border-gray-700' : ''}">
-                    <span>${i + 1}. ${entry.nickname}</span><span>${entry.score}%</span>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Failed to load leaderboard:', error);
-            this.leaderboardContent.innerHTML = '<p class="text-red-400">Failed to load leaderboard.</p>';
-        }
     }
 
     showQuizSettings(subject) {
@@ -261,7 +243,7 @@ export default class QuizApp {
     displayQuestion() {
         this.questionCounter.textContent = `Question ${this.currentQuestionIndex + 1} of ${this.totalQuestions}`;
         this.questionText.textContent = this.currentQuestion.question || 'Question text not available';
-        const progress = ((this.currentQuestionIndex) / this.totalQuestions) * 100;
+        const progress = ((this.currentQuestionIndex + 1) / this.totalQuestions) * 100;
         this.progressFill.style.width = `${progress}%`;
         if (this.currentQuestion.image) {
             this.questionImage.src = this.currentQuestion.image;
@@ -336,6 +318,8 @@ export default class QuizApp {
         const isCorrect = this.selectedAnswer === this.currentQuestion.answer;
         if (isCorrect) this.score++;
         this.sessionData.push({
+            nickname: this.profileName.textContent,
+            subject: this.currentSubject,
             question: this.currentQuestion,
             userAnswer: this.selectedAnswer,
             correct: isCorrect,
@@ -378,7 +362,7 @@ export default class QuizApp {
         }
     }
 
-    cleanAIResponse(text) {
+    cleanAIResponse() {
         return text
             .replace(/\*\*|\*|_|\#\#/g, '')
             .replace(/\n\s*\n/g, '\n')
@@ -443,15 +427,15 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         hideElement('quizSection');
         showElement('reviewSection');
         this.showReview();
-        this.showConfetti();
         localStorage.setItem('quizResults', JSON.stringify(this.sessionData));
+        this.showConfetti();
     }
 
     showReview() {
         this.reviewContent.innerHTML = '';
         this.sessionData.forEach((data, index) => {
             const div = document.createElement('div');
-            div.className = 'bg-gray-800 p-4 rounded mb-4';
+            div.className = 'bg-gray-800 p-3 rounded mb-2';
             div.innerHTML = `
                 <p class="font-bold">Question ${index + 1}: ${data.question.question}</p>
                 <p>Your Answer: ${data.userAnswer || 'No answer'}</p>
@@ -487,11 +471,11 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
             if (imageTitle) {
                 const imageInfoResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(imageTitle)}&prop=imageinfo&iiprop=url&format=json&origin=*`);
                 const imageInfoData = await imageInfoResponse.json();
-                imageUrl = Object.values(imageInfoData.query.pages)[0]?.imageinfo[0]?.url || '';
+                imageUrl = Object.values(imageData.query.pages)[0]?.imageinfo[0]?.url || '';
             }
             const content = parseData.parse.text['*'];
             this.wikiContent.innerHTML = `
-                <h3 class="text-xl font-bold mb-2">${topResult}</h3>
+                <h3 class="text-lg md:text-xl font-bold mb-2">${topResult}</h3>
                 ${imageUrl ? `<img src="${imageUrl}" alt="${topResult}" class="max-w-full h-auto mb-4 rounded">` : ''}
                 <div class="wiki-extract">${content.slice(0, 1000)}...</div>
                 <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(topResult)}" target="_blank" class="text-blue-400 hover:underline">Read more on Wikipedia</a>
@@ -513,40 +497,25 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
     }
 
     getCalculatorContent() {
-        if (this.currentSubject === 'Mathematics') {
+        if (['Mathematics', 'Physics', 'Chemistry'].includes(this.currentSubject)) {
             return `
                 <div class="space-y-4">
-                    <h3 class="text-lg font-semibold">Quadratic Equation Solver (ax² + bx + c = 0)</h3>
-                    <div class="grid grid-cols-3 gap-2">
-                        <input id="quadA" type="number" placeholder="a" class="p-2 bg-gray-700 rounded text-sm">
-                        <input id="quadB" type="number" placeholder="b" class="p-2 bg-gray-700 rounded text-sm">
-                        <input id="quadC" type="number" placeholder="c" class="p-2 bg-gray-700 rounded text-sm">
-                    </div>
-                    <button id="solveQuad" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 w-full text-sm">Solve</button>
-                    <p id="quadResult" class="text-sm"></p>
-                    <h3 class="text-lg font-semibold">Basic Calculator</h3>
-                    <input id="basicCalc" type="text" placeholder="e.g., 2 + 3 * 4" class="w-full p-2 bg-gray-700 rounded text-sm">
-                    <button id="evalBasic" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 w-full text-sm">Calculate</button>
-                    <p id="basicResult" class="text-sm"></p>
+                    <h3 class="text-lg md:text-base font-semibold">Basic Calculator</h3>
+                    <input id="basicCalc" type="text" placeholder="e.g., 2 + 3 * 4" class="w-full p-2 bg-gray-700 rounded text-sm md:text-base">
+                    <button id="evalBasic" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 w-full text-sm md:text-base">Calculate</button>
+                    <p id="basicResult" class="text-sm md:text-base"></p>
+                    ${this.currentSubject === 'Mathematics' ? `
+                        <h3 class="text-lg md:text-base font-semibold">Quadratic Equation Solver (ax² + bx + c = 0)</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input id="quadA" type="number" placeholder="a" class="p-2 bg-gray-700 rounded text-sm">
+                            <input id="quadB" type="number" placeholder="b" class="p-2 bg-gray-700 rounded text-sm">
+                            <input id="quadC" type="number" placeholder="c" class="p-2 bg-gray-700 rounded text-sm">
+                        </div>
+                        <button id="solveQuad" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 w-full text-sm">Solve</button>
+                        <p id="quadResult" class="text-sm md-text-base"></p>
+                    ` : ''}
                 </div>
                 <script>
-                    document.getElementById('solveQuad').addEventListener('click', () => {
-                        const a = parseFloat(document.getElementById('quadA').value);
-                        const b = parseFloat(document.getElementById('quadB').value);
-                        const c = parseFloat(document.getElementById('quadC').value);
-                        if (isNaN(a) || isNaN(b) || isNaN(c)) {
-                            document.getElementById('quadResult').textContent = 'Please enter valid numbers';
-                            return;
-                        }
-                        const discriminant = b * b - 4 * a * c;
-                        if (discriminant < 0) {
-                            document.getElementById('quadResult').textContent = 'No real roots';
-                        } else {
-                            const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-                            const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-                            document.getElementById('quadResult').textContent = 'Roots: x1 = ' + x1.toFixed(2) + ', x2 = ' + x2.toFixed(2);
-                        }
-                    });
                     document.getElementById('evalBasic').addEventListener('click', () => {
                         try {
                             const expr = document.getElementById('basicCalc').value;
@@ -556,13 +525,32 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
                             document.getElementById('basicResult').textContent = 'Invalid expression';
                         }
                     });
+                    ${this.currentSubject === 'Mathematics' ? `
+                        document.getElementById('solveQuad').addEventListener('click', () => {
+                            const a = parseFloat(document.getElementById('quadA').value);
+                            const b = parseFloat(document.getElementById('quadB').value);
+                            const c = parseFloat(document.getElementById('quadC').value);
+                            if (isNaN(a) || isNaN(b) || isNaN(c))) {
+                                document.getElementById('quadResult').textContent = 'Please enter valid numbers';
+                                return;
+                            }
+                            const discriminant = b * b - 4 * a * c;
+                            if (discriminant < 0) {
+                                document.getElementById('quadResult').textContent = 'No real roots';
+                            } else {
+                                const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                                const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                                document.getElementById('quadResult').textContent = `Roots: x1.toFixed(2)}, x2 = ${x2.toFixed(2)}`;
+                            }
+                        });
+                    ` : ''}
                 </script>
             `;
         }
-        return '';
+        return '<p class="text-sm md:text-base">No calculator available for this subject.</p>';
     }
 
-    showStudyPlan(subject) {
+    async showStudyPlan(subjectId) {
         this.currentStudySubject = subject;
         this.studySubjectTitle.textContent = subject;
         hideElement('dashboard');
@@ -598,7 +586,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
 
     getSubjectTopics(subject) {
         const topics = {
-            'English': ['Comprehension Passages', 'Grammar and Syntax', 'Vocabulary and Word Formation'],
+            'English': ['Comprehension Passages', 'Grammar and Syntax', 'Vocabulary'],
             'Mathematics': ['Algebra', 'Coordinate Geometry', 'Trigonometry'],
             'Biology': ['Cell Biology', 'Genetics', 'Ecology'],
             'Physics': ['Mechanics', 'Waves', 'Electricity'],
@@ -611,31 +599,31 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
     }
 
     async generateStudyPlan(topic) {
-        this.studyPlanContent.innerHTML = '<div class="flex items-center justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div><span class="ml-2">Generating comprehensive study plan...</span></div>';
+        this.studyPlanContent.innerHTML = '<div class="flex items-center justify-center py-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div><span class="ml-2">Generating study plan...</span></div>';
         try {
-            const prompt = `Create a concise study plan for the topic "${topic}" in ${this.currentStudySubject} for the University of Ibadan POST UTME CBT. Include key concepts, descriptions, recommended resources, and 2-3 practice questions. Structure the response as a table with columns: Concept, Description, Resources, Practice Questions. Keep it clear, engaging, and under 300 words. No markdown formatting.`;
+            const prompt = `Create a concise study plan for the topic "${topic}" in ${this.currentStudySubject} for the University of Ibadan POST UTME CBT. Include key concepts, descriptions, recommended resources, and 2 practice questions. Structure the response as a table with columns: Concept, Description, Resources, Practice Questions. Keep it clear, engaging, and under 300 words. No markdown formatting.`;
             const response = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4.1?ask=${encodeURIComponent(prompt)}&uid=1268&apikey=a0ebe80e-bf1a-4dbf-8d36-6935b1bfa5ea`);
             if (!response.ok) throw new Error('API failed');
             const data = await response.json();
             const content = this.cleanAIResponse(data.response);
-            const rows = content.split('\n').filter(row => row.includes('|')).map(row => row.split('|').map(cell => cell.trim()));
+            const rows = content.trim().split('\n').filter(row => row.includes('|')).map(row => row.split('|').map(cell => cell.trim()));
             this.studyPlanContent.innerHTML = `
                 <table class="w-full border-collapse border border-gray-600 text-sm md:text-base">
                     <thead>
                         <tr class="bg-gray-700">
-                            <th class="border border-gray-600 p-2">Concept</th>
-                            <th class="border border-gray-600 p-2">Description</th>
-                            <th class="border border-gray-600 p-2">Resources</th>
-                            <th class="border border-gray-600 p-2">Practice Questions</th>
+                            <th class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">Concept</th>
+                            <th class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">Description</th>
+                            <th class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">Resources</th>
+                            <th class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">Practice Questions</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${rows.map(row => `
                             <tr>
-                                <td class="border border-gray-600 p-2">${row[0] || ''}</td>
-                                <td class="border border-gray-600 p-2">${row[1] || ''}</td>
-                                <td class="border border-gray-600 p-2">${row[2] || ''}</td>
-                                <td class="border border-gray-600 p-2">${row[3] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-2 md:px-2">${row[0] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-2 md:px-2 py-2">${row[1] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-2 md:px-2 py-2">${row[2] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-2 md:px-2 py-2">${row[3] || ''}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -643,7 +631,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
             `;
         } catch (error) {
             console.error('Error generating study plan:', error);
-            this.studyPlanContent.innerHTML = `<p>Study Plan for ${topic}: Review key concepts in your ${this.currentStudySubject} textbook. Practice related questions to solidify understanding.</p>`;
+            this.studyPlanContent.innerHTML = `<p class="text-sm md:text-base">Study Plan for ${topic}: Review key concepts in your ${this.currentStudySubject} textbook. Practice related questions to solidify understanding.</p>
         }
         this.updateStudyProgress();
     }
@@ -655,14 +643,10 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         if (!this.studiedTopics[this.currentStudySubject].includes(this.currentTopic)) {
             this.studiedTopics[this.currentStudySubject].push(this.currentTopic);
             try {
-                await fetch('http://localhost:5000/api/studied', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nickname: this.profileName.textContent,
-                        subject: this.currentStudySubject,
-                        topic: this.currentTopic
-                    })
+                await saveStudiedTopic({
+                    nickname: this.profileName.textContent,
+                    subject: this.currentStudySubject,
+                    topic: this.currentTopic
                 });
                 localStorage.setItem('studiedTopics', JSON.stringify(this.studiedTopics));
             } catch (error) {
@@ -685,5 +669,22 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         this.isTopicBasedQuiz = true;
         this.currentTopicContext = this.currentTopic;
         this.startQuiz(this.currentStudySubject);
+    }
+
+    async showLeaderboardSection() {
+        hideElement('dashboard');
+        showElement('leaderboardSection');
+        try {
+            const leaderboard = await fetchLeaderboard();
+            this.leaderboardContent.innerHTML = leaderboard.map((entry, index) => `
+                <div class="flex justify-between py-2 ${index < leaderboard.length - 1 ? 'border-b border-gray-700' : ''}">
+                    <span class="text-sm md:text-base">${index + 1}. ${entry.nickname}</span>
+                    <span class="text-sm md:text-base">${entry.score}%</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Failed to load leaderboard:', error);
+            this.leaderboardContent.innerHTML = '<p class="text-red-500 text-sm md:text-base">Failed to load leaderboard.</p>';
+        }
     }
 }
