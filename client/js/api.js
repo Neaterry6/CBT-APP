@@ -19,6 +19,16 @@ export async function saveQuizResult(result) {
     return response.json();
 }
 
+export async function saveStudiedTopic(topic) {
+    const response = await fetch('http://localhost:5000/api/topic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(topic)
+    });
+    if (!response.ok) throw new Error('Failed to save studied topic');
+    return response.json();
+}
+
 export async function fetchLeaderboard() {
     const response = await fetch('http://localhost:5000/api/leaderboard');
     if (!response.ok) throw new Error('Failed to fetch leaderboard');
