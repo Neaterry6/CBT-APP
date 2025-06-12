@@ -5,4 +5,4 @@ export function showElement(id) {
 
 export function hideElement(id) {
     document.getElementById(id).classList.add('hidden');
-}
+} 
