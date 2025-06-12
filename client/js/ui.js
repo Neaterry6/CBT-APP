@@ -1,3 +1,4 @@
+// client/js/ui.js
 export function showElement(id) {
     document.getElementById(id).classList.remove('hidden');
 }
