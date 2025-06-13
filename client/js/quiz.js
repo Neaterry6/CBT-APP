@@ -1,4 +1,3 @@
-// client/js/quiz.js
 import { showElement, hideElement } from './ui.js';
 import { saveUserProfile, saveQuizResult, saveStudiedTopic, fetchLeaderboard } from './api.js';
 
@@ -114,13 +113,14 @@ export default class QuizApp {
         });
         document.querySelectorAll('.study-plan-btn').forEach(btn => {
             btn.addEventListener('click', () => this.showStudyPlan(btn.dataset.subject));
-        }
+        });
+    }
+
     async init() {
-        console.log('Initializing QuizApp...');
         try {
             hideElement('loadingPage');
-            showElementById('appContainer'));
-            let profile = JSON.parse(localStorage.getItem('profile') || {};
+            showElement('appContainer');
+            const profile = JSON.parse(localStorage.getItem('profile')) || {};
             if (profile.nickname) {
                 this.profileName.textContent = profile.nickname;
                 this.welcomeName.textContent = profile.nickname;
@@ -131,7 +131,7 @@ export default class QuizApp {
             }
         } catch (error) {
             console.error('Initialization failed:', error);
-            showElementById('authModal');
+            showElement('authModal');
             alert('Failed to initialize app. Please refresh.');
         }
     }
@@ -355,14 +355,14 @@ export default class QuizApp {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
             confetti.style.left = `${Math.random() * 100}vw`;
-            confetti.style.background = ['#f00', '#0f0', '#00f', '#ff0'][Math.floor(Math.random() * 4)];
+            confetti.style.backgroundColor = ['#f00', '#0f0', '#00f0', '#ff0'][Math.floor(Math.random() * 4)];
             confetti.style.animationDelay = `${Math.random() * 2}s`;
             confettiContainer.appendChild(confetti);
             setTimeout(() => confetti.remove(), 3000);
         }
     }
 
-    cleanAIResponse() {
+    cleanAIResponse(text) {
         return text
             .replace(/\*\*|\*|_|\#\#/g, '')
             .replace(/\n\s*\n/g, '\n')
@@ -387,7 +387,7 @@ Student's Answer: ${this.selectedAnswer || 'No answer selected'}
 
 Explanation should be 150-300 words, structured with an introduction, explanation of the correct answer, analysis of incorrect options, and a summary of key takeaways. After the explanation, explicitly state: "Correct Answer: [answer]".`;
 
-            const response = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4.1?ask=${encodeURIComponent(prompt)}&uid=1268&apikey=a0ebe80e-bf1a-4dbf-8d36-6935b1bfa5ea`);
+            const response = await fetch(`https://kaiz-apis.gorge.net/api/gpt-4.1?ask=${encodeURIComponent(prompt)}&uid=1268&apikey=a0ebe80e-bf1a-4dbf-8d36-6935b1bfa5ea`);
             if (!response.ok) throw new Error('API failed');
             const data = await response.json();
             this.explanationText.textContent = this.cleanAIResponse(data.response) + `\n\nCorrect Answer: ${this.currentQuestion.answer}`;
@@ -451,7 +451,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         const query = this.wikiSearchInput.value.trim();
         if (!query) {
             alert('Please enter a search term');
-            return;
+            return '';
         }
         this.wikiContent.innerHTML = '<div class="flex items-center justify-center py-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div><span class="ml-2">Searching...</span></div>';
         showElement('wikiResults');
@@ -464,14 +464,14 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
             const parseResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(topResult)}&prop=text&format=json&origin=*`);
             if (!parseResponse.ok) throw new Error('Parse failed');
             const parseData = await parseResponse.json();
-            const imageResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(topResult)}&prop=images&format=json&origin=*`);
-            const imageData = imageResponse.ok ? await imageResponse.json() : {};
-            const imageTitle = Object.values(imageData.query.pages)[0]?.images[0]?.title;
+            const imageResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&pages=${encodeURIComponent(topResult)}&prop=images&format=json&origin=*`);
+            const imageData = imageResponse.ok ? await imageResponse.json() : null;
+            const imageTitle = Object.values(imageData.query.pages)[0]?.images?.[0]?.title;
             let imageUrl = '';
             if (imageTitle) {
-                const imageInfoResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(imageTitle)}&prop=imageinfo&iiprop=url&format=json&origin=*`);
+                const imageInfoImageResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(imageTitle)}&prop=imageInfo&iiprop=url&format=json&origin=*`);
                 const imageInfoData = await imageInfoResponse.json();
-                imageUrl = Object.values(imageData.query.pages)[0]?.imageinfo[0]?.url || '';
+                imageUrl = Object.values(imageInfoData.query.pages)[0]?.imageinfo?.[0]?.url || '';
             }
             const content = parseData.parse.text['*'];
             this.wikiContent.innerHTML = `
@@ -482,7 +482,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
             `;
         } catch (error) {
             console.error('Wikipedia search error:', error);
-            this.wikiContent.innerHTML = '<p class="text-red-400">Failed to load Wikipedia content. Please try again.</p>';
+            this.wikiContent.innerHTML = '<p class="text-red-500">Failed to load Wikipedia content. Please try again.</p>';
         }
     }
 
@@ -490,10 +490,12 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         showElement('calculatorModal');
         this.calculatorTitle.textContent = `${this.currentSubject} Calculator`;
         this.calculatorContent.innerHTML = this.getCalculatorContent();
-    }
+        });
 
     closeCalculatorModal() {
         hideElement('calculatorModal');
+        });
+
     }
 
     getCalculatorContent() {
@@ -530,7 +532,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
                             const a = parseFloat(document.getElementById('quadA').value);
                             const b = parseFloat(document.getElementById('quadB').value);
                             const c = parseFloat(document.getElementById('quadC').value);
-                            if (isNaN(a) || isNaN(b) || isNaN(c))) {
+                            if (isNaN(a) || isNaN(b) || isNaN(c)) {
                                 document.getElementById('quadResult').textContent = 'Please enter valid numbers';
                                 return;
                             }
@@ -540,7 +542,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
                             } else {
                                 const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
                                 const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-                                document.getElementById('quadResult').textContent = `Roots: x1.toFixed(2)}, x2 = ${x2.toFixed(2)}`;
+                                document.getElementById('quadResult').textContent = `Roots: x1 = ${x1.toFixed(2)}, x2 = ${x2.toFixed(2)}`;
                             }
                         });
                     ` : ''}
@@ -550,7 +552,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         return '<p class="text-sm md:text-base">No calculator available for this subject.</p>';
     }
 
-    async showStudyPlan(subjectId) {
+    async showStudyPlan(subject) {
         this.currentStudySubject = subject;
         this.studySubjectTitle.textContent = subject;
         hideElement('dashboard');
@@ -602,7 +604,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
         this.studyPlanContent.innerHTML = '<div class="flex items-center justify-center py-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div><span class="ml-2">Generating study plan...</span></div>';
         try {
             const prompt = `Create a concise study plan for the topic "${topic}" in ${this.currentStudySubject} for the University of Ibadan POST UTME CBT. Include key concepts, descriptions, recommended resources, and 2 practice questions. Structure the response as a table with columns: Concept, Description, Resources, Practice Questions. Keep it clear, engaging, and under 300 words. No markdown formatting.`;
-            const response = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4.1?ask=${encodeURIComponent(prompt)}&uid=1268&apikey=a0ebe80e-bf1a-4dbf-8d36-6935b1bfa5ea`);
+            const response = await fetch(`https://kaiz-apis.gorge.net/api/gpt-4?ask=${encodeURIComponent(prompt)}&uid=1268&apikey=0ebe80a0-bf1a-4dbf-8d36-6935b1bfa5ea`);
             if (!response.ok) throw new Error('API failed');
             const data = await response.json();
             const content = this.cleanAIResponse(data.response);
@@ -620,10 +622,10 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
                     <tbody>
                         ${rows.map(row => `
                             <tr>
-                                <td class="border border-gray-600 px-2 py-2 md:px-2">${row[0] || ''}</td>
-                                <td class="border border-gray-600 px-2 py-2 md:px-2 py-2">${row[1] || ''}</td>
-                                <td class="border border-gray-600 px-2 py-2 md:px-2 py-2">${row[2] || ''}</td>
-                                <td class="border border-gray-600 px-2 py-2 md:px-2 py-2">${row[3] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">${row[0] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">${row[1] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">${row[2] || ''}</td>
+                                <td class="border border-gray-600 px-2 py-1 md:px-4 md:py-2">${row[3] || ''}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -631,7 +633,7 @@ Explanation should be 150-300 words, structured with an introduction, explanatio
             `;
         } catch (error) {
             console.error('Error generating study plan:', error);
-            this.studyPlanContent.innerHTML = `<p class="text-sm md:text-base">Study Plan for ${topic}: Review key concepts in your ${this.currentStudySubject} textbook. Practice related questions to solidify understanding.</p>
+            this.studyPlanContent.innerHTML = `<p class="text-sm md:text-base">Study Plan for ${topic}: Review key concepts in your ${this.currentStudySubject} textbook. Practice related questions to solidify understanding.</p>`;
         }
         this.updateStudyProgress();
     }
