@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "projects": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "client/dist",
+        "installCommand": "cd client && npm install",
+        "buildCommand": "cd client && npm run build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://utme-cbt-server.onrender.com/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist/index.html"
+    }
+  ],
+  "env": {
+    "SERVER_URL": "@server_url"
+  }
+}
