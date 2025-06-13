@@ -1,4 +1,3 @@
-// server/models/StudiedTopic.js
 const mongoose = require('mongoose');
 const studiedTopicSchema = new mongoose.Schema({
     nickname: { type: String, required: true },
